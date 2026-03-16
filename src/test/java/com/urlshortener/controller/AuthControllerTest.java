@@ -6,6 +6,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,6 +28,8 @@ import com.urlshortener.domain.dto.response.AuthResponse;
 import com.urlshortener.exception.UserAlreadyExistsException;
 import com.urlshortener.service.AuthService;
 import com.urlshortener.service.JwtService;
+import com.urlshortener.service.RateLimitService;
+import com.urlshortener.service.RateLimitService.RateLimitResult;
 
 /**
  * Slice tests for AuthController.
@@ -43,9 +47,17 @@ class AuthControllerTest {
   @Autowired private ObjectMapper objectMapper;
 
   @MockBean private AuthService authService;
+
+  @BeforeEach
+  void setUp() {
+    RateLimitResult allowed = new RateLimitResult(true, 30, 29, 60);
+    when(rateLimitService.checkIpLimit(any())).thenReturn(allowed);
+    when(rateLimitService.checkUserLimit(any())).thenReturn(allowed);
+  }
   // Needed to construct JwtAuthenticationFilter (which is a @Component)
   @MockBean private JwtService jwtService;
   @MockBean private UserDetailsService userDetailsService;
+  @MockBean private RateLimitService rateLimitService;
 
   private AuthResponse sampleAuthResponse() {
     return AuthResponse.builder()

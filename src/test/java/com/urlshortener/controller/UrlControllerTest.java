@@ -34,6 +34,8 @@ import com.urlshortener.domain.dto.response.UrlResponse;
 import com.urlshortener.domain.entity.User;
 import com.urlshortener.exception.UrlNotFoundException;
 import com.urlshortener.service.JwtService;
+import com.urlshortener.service.RateLimitService;
+import com.urlshortener.service.RateLimitService.RateLimitResult;
 import com.urlshortener.service.UrlService;
 
 /**
@@ -55,11 +57,17 @@ class UrlControllerTest {
   @MockBean private UrlService urlService;
   @MockBean private JwtService jwtService;
   @MockBean private UserDetailsService userDetailsService;
+  @MockBean private RateLimitService rateLimitService;
 
   private User testUser;
 
   @BeforeEach
   void setUp() {
+    // Allow all requests through the rate limit filter in controller slice tests
+    RateLimitResult allowed = new RateLimitResult(true, 60, 59, 60);
+    when(rateLimitService.checkUserLimit(any())).thenReturn(allowed);
+    when(rateLimitService.checkIpLimit(any())).thenReturn(allowed);
+
     testUser =
         User.builder()
             .id(UUID.randomUUID())

@@ -1,9 +1,12 @@
 package com.urlshortener.controller;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import org.junit.jupiter.api.BeforeEach;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +22,8 @@ import com.urlshortener.config.SecurityConfig;
 import com.urlshortener.exception.UrlExpiredException;
 import com.urlshortener.exception.UrlNotFoundException;
 import com.urlshortener.service.JwtService;
+import com.urlshortener.service.RateLimitService;
+import com.urlshortener.service.RateLimitService.RateLimitResult;
 import com.urlshortener.service.UrlService;
 
 /**
@@ -35,8 +40,16 @@ class RedirectControllerTest {
   @Autowired private MockMvc mockMvc;
 
   @MockBean private UrlService urlService;
+
+  @BeforeEach
+  void setUp() {
+    RateLimitResult allowed = new RateLimitResult(true, 30, 29, 60);
+    when(rateLimitService.checkIpLimit(any())).thenReturn(allowed);
+    when(rateLimitService.checkUserLimit(any())).thenReturn(allowed);
+  }
   @MockBean private JwtService jwtService;
   @MockBean private UserDetailsService userDetailsService;
+  @MockBean private RateLimitService rateLimitService;
 
   @Test
   void redirect_validShortCode_shouldReturn302WithLocationHeader() throws Exception {

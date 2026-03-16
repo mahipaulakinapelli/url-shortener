@@ -27,6 +27,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.urlshortener.security.JwtAuthenticationFilter;
+import com.urlshortener.security.RateLimitFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,6 +53,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthFilter;
+  private final RateLimitFilter rateLimitFilter;
   private final UserDetailsService userDetailsService;
   private final AppProperties appProperties;
 
@@ -116,6 +118,8 @@ public class SecurityConfig {
         .authenticationProvider(authenticationProvider())
         // Run JWT validation before Spring's default username/password filter
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+        // Rate limiting runs after JWT so SecurityContext is populated (enables per-user keying)
+        .addFilterAfter(rateLimitFilter, JwtAuthenticationFilter.class)
         .build();
   }
 

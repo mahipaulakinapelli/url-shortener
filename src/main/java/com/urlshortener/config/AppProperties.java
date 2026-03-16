@@ -48,6 +48,9 @@ public class AppProperties {
   /** Scheduled cleanup settings. */
   private Cleanup cleanup = new Cleanup();
 
+  /** Rate limiting settings. */
+  private RateLimit rateLimit = new RateLimit();
+
   /**
    * JWT configuration values.
    *
@@ -81,6 +84,29 @@ public class AppProperties {
      */
     private java.util.List<String> allowedOrigins =
         java.util.List.of("http://localhost:4200");
+  }
+
+  /** Rate limiting configuration. */
+  @Data
+  public static class RateLimit {
+
+    /**
+     * Max requests an authenticated user can make per window. Defaults to 60/min.
+     * Override via {@code RATE_LIMIT_USER} env var.
+     */
+    private int maxRequestsPerUser = 60;
+
+    /**
+     * Max requests an unauthenticated IP can make per window. Defaults to 30/min.
+     * Override via {@code RATE_LIMIT_IP} env var.
+     */
+    private int maxRequestsPerIp = 30;
+
+    /**
+     * Sliding window size in seconds. Defaults to 60 (1 minute).
+     * Override via {@code RATE_LIMIT_WINDOW} env var.
+     */
+    private int windowSeconds = 60;
   }
 
   /** Scheduled cleanup configuration. */

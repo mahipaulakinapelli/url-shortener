@@ -61,6 +61,10 @@ app:
     url-ttl: ${CACHE_URL_TTL:3600}
   cleanup:
     cron: ${CLEANUP_CRON:0 0 * * * *}
+  rate-limit:
+    max-requests-per-user: ${RATE_LIMIT_USER:60}
+    max-requests-per-ip: ${RATE_LIMIT_IP:30}
+    window-seconds: ${RATE_LIMIT_WINDOW:60}
 
 logging:
   level:
