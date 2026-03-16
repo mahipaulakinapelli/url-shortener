@@ -1,5 +1,7 @@
 package com.urlshortener.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -32,4 +34,19 @@ public interface UrlRepository extends JpaRepository<Url, Long> {
   @Modifying
   @Query("UPDATE Url u SET u.clickCount = u.clickCount + 1 WHERE u.shortCode = :shortCode")
   void incrementClickCountByShortCode(@Param("shortCode") String shortCode);
+
+  /**
+   * Returns the short codes of all URLs whose expiry time has passed.
+   * Fetching only the short code avoids loading full entities just for cache eviction.
+   */
+  @Query("SELECT u.shortCode FROM Url u WHERE u.expiresAt IS NOT NULL AND u.expiresAt < :now")
+  List<String> findExpiredShortCodes(@Param("now") LocalDateTime now);
+
+  /**
+   * Bulk-deletes all URLs whose expiry time has passed.
+   * Returns the number of rows deleted.
+   */
+  @Modifying
+  @Query("DELETE FROM Url u WHERE u.expiresAt IS NOT NULL AND u.expiresAt < :now")
+  int deleteAllExpiredBefore(@Param("now") LocalDateTime now);
 }

@@ -59,6 +59,8 @@ app:
     refresh-token-expiration: ${JWT_REFRESH_EXPIRY:604800000}
   cache:
     url-ttl: ${CACHE_URL_TTL:3600}
+  cleanup:
+    cron: ${CLEANUP_CRON:0 0 * * * *}
 
 logging:
   level:

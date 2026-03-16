@@ -45,6 +45,9 @@ public class AppProperties {
   /** CORS settings. */
   private Cors cors = new Cors();
 
+  /** Scheduled cleanup settings. */
+  private Cleanup cleanup = new Cleanup();
+
   /**
    * JWT configuration values.
    *
@@ -78,6 +81,18 @@ public class AppProperties {
      */
     private java.util.List<String> allowedOrigins =
         java.util.List.of("http://localhost:4200");
+  }
+
+  /** Scheduled cleanup configuration. */
+  @Data
+  public static class Cleanup {
+
+    /**
+     * Cron expression controlling how often the expired-URL cleanup job runs.
+     * Defaults to {@code "0 0 * * * *"} (top of every hour).
+     * Override via {@code CLEANUP_CRON} env var.
+     */
+    private String cron = "0 0 * * * *";
   }
 
   /** Redis cache configuration values. */
