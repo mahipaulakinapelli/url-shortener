@@ -57,7 +57,8 @@ public class AppProperties {
 
     /**
      * Base64-encoded HMAC secret used to sign and verify all JWTs. Decoded at runtime by {@link
-     * com.urlshortener.service.JwtService#getSigningKey()}.
+     * com.urlshortener.service.JwtService#
+     * getSigningKey()}.
      */
     private String secret;
 
